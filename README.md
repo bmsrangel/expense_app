@@ -3,7 +3,8 @@
 A project to help organizing transportation expenses.
 
 Todo:
-[ ] Replace service providers strings by enum
+
+- [ ] Replace service providers strings by enum
 
 ## Getting Started
 
