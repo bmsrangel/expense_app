@@ -1,12 +1,11 @@
-import 'package:expense_app/app/modules/home/widgets/expenses_list/expenses_list_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 
-import '../../shared/extensions/money_extension.dart';
 import '../../shared/models/expense_model.dart';
 import '../../shared/utils/contants.dart';
 import 'home_bloc.dart';
 import 'widgets/dismissible_background/dismissible_background_widget.dart';
+import 'widgets/expenses_list/expenses_list_widget.dart';
 import 'widgets/new_expense/new_expense_widget.dart';
 import 'widgets/total_amount/total_amount_widget.dart';
 
