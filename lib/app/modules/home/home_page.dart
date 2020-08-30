@@ -1,14 +1,17 @@
-import 'package:expense_app/app/modules/home/widgets/new_expense/new_expense_widget.dart';
+import 'package:expense_app/app/modules/home/widgets/expenses_list/expenses_list_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 
 import '../../shared/extensions/money_extension.dart';
 import '../../shared/models/expense_model.dart';
+import '../../shared/utils/contants.dart';
 import 'home_bloc.dart';
+import 'widgets/dismissible_background/dismissible_background_widget.dart';
+import 'widgets/new_expense/new_expense_widget.dart';
+import 'widgets/total_amount/total_amount_widget.dart';
 
 class HomePage extends StatefulWidget {
-  final String title;
-  const HomePage({Key key, this.title = "Expenses List"}) : super(key: key);
+  const HomePage({Key key}) : super(key: key);
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -24,43 +27,32 @@ class _HomePageState extends State<HomePage> {
         title: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
-              Text(widget.title),
+              const Text("Expenses List"),
               StreamBuilder<List<ExpenseModel>>(
                 stream: this.controller.outExpensesList,
                 initialData: <ExpenseModel>[],
-                builder: (context, snapshot) => snapshot.data.length == 0
-                    ? Text(0.0.toMoney())
-                    : Text(snapshot.data
-                        .map((e) => e.value)
-                        .reduce((value, element) => value + element)
-                        .toMoney()),
+                builder: (context, snapshot) =>
+                    TotalAmountWidget(expensesList: snapshot.data),
               ),
             ]),
       ),
       body: StreamBuilder<List<ExpenseModel>>(
         stream: this.controller.outExpensesList,
-        initialData: <ExpenseModel>[],
         builder: (context, snapshot) {
-          if (snapshot.data.length == 0) {
+          if (!snapshot.hasData) {
             return Center(
-              child: Text("No expenses added."),
+              child: const CircularProgressIndicator(),
+            );
+          } else if (snapshot.data.length == 0) {
+            return Center(
+              child: const Text("No expenses added."),
             );
           } else {
-            return ListView.builder(
-              itemCount: snapshot.data.length,
-              itemBuilder: (_, index) {
-                ExpenseModel item = snapshot.data[index];
-                return ListTile(
-                  title: Text(item.description),
-                  subtitle: Text(DateTime.now().toString().split(" ")[0]),
-                  trailing: Text(item.value.toMoney()),
-                  leading: CircleAvatar(
-                    child: Image.asset(
-                      this.controller.imagesPath[item.serviceProvider],
-                    ),
-                  ),
-                );
-              },
+            return ExpensesListWidget(
+              expensesList: snapshot.data,
+              dismissibleBackground: DismissibleBackgroundWidget(),
+              onDismissed: this.controller.onDismissed,
+              serviceProviderImagePaths: Utils.serviceProvidersImagePath,
             );
           }
         },
@@ -74,7 +66,7 @@ class _HomePageState extends State<HomePage> {
           this.controller.getAllExpenses();
         },
         tooltip: 'Add expense',
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
       ),
     );
   }

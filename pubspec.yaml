@@ -21,7 +21,6 @@ environment:
   sdk: ">=2.7.0 <3.0.0"
 
 dependencies:
-  flutter_multi_formatter: ^1.1.6
   path_provider: ^1.6.14
   hive: ^1.4.4
   dio: ^3.0.10

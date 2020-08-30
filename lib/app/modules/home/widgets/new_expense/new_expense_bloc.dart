@@ -50,6 +50,18 @@ class NewExpenseBloc extends Disposable {
     this.serviceProvider = serviceProvider;
   }
 
+  void onConfirmPressed() {
+    if (this.formKey.currentState.validate()) {
+      this.setExpenseValue();
+      this.createExpense();
+      Modular.to.pop();
+    }
+  }
+
+  void onCancelPressed() {
+    Modular.to.pop();
+  }
+
   //dispose will be called automatically by closing its streams
   @override
   void dispose() {

@@ -36,7 +36,7 @@ class HiveService implements ILocalStorageService {
   @override
   Future deleteExpense(ExpenseModel expense) async {
     final Box box = await this.completer.future;
-    await box.deleteAt(expense.id);
+    await box.delete(expense.id);
   }
 
   @override

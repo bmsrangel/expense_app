@@ -1,17 +1,12 @@
-import 'package:expense_app/app/shared/models/expense_model.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:rxdart/rxdart.dart';
 
+import '../../shared/models/expense_model.dart';
 import '../../shared/services/interfaces/local_storage_service_interface.dart';
 
 class HomeBloc extends Disposable {
   final ILocalStorageService _storageService;
-  Map<String, String> imagesPath = {
-    "99": "images/logo_99.png",
-    "Uber": "images/logo_uber.png",
-    "Taxi": "images/logo_taxi.png",
-  };
-  List<ExpenseModel> _expensesList = <ExpenseModel>[];
+  List<ExpenseModel> _expensesList;
   HomeBloc(this._storageService) {
     this.getAllExpenses();
   }
@@ -23,10 +18,20 @@ class HomeBloc extends Disposable {
 
   void getAllExpenses() {
     this._storageService.getAllExpenses().then((value) {
-      this._expensesList.clear();
-      this._expensesList.addAll(value);
+      if (this._expensesList == null) {
+        this._expensesList = List.from(value);
+      } else {
+        this._expensesList.clear();
+        this._expensesList.addAll(value);
+      }
       this.inExpensesList.add(this._expensesList);
     });
+  }
+
+  void onDismissed(ExpenseModel expense) async {
+    await this._storageService.deleteExpense(expense);
+    this._expensesList.removeWhere((element) => element.id == expense.id);
+    this.inExpensesList.add(this._expensesList);
   }
 
   //dispose will be called automatically by closing its streams
