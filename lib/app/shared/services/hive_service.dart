@@ -40,7 +40,7 @@ class HiveService implements ILocalStorageService {
   }
 
   @override
-  Future getAllExpenses() async {
+  Future<List<ExpenseModel>> getAllExpenses() async {
     final Box box = await this.completer.future;
     return box.values.map((item) => ExpenseModel.fromMap(item)).toList();
   }
