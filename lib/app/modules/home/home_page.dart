@@ -6,7 +6,7 @@ import '../../shared/models/expense_model.dart';
 import '../../shared/utils/utils_class.dart';
 import 'home_bloc.dart';
 import 'widgets/dismissible_background/dismissible_background_widget.dart';
-import 'widgets/expenses_list/expenses_list_tile_widget.dart';
+import 'widgets/expenses_list_tile/expenses_list_tile_widget.dart';
 import 'widgets/new_expense/new_expense_widget.dart';
 
 class HomePage extends StatefulWidget {
@@ -21,50 +21,75 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    double statusBarHeight = MediaQuery.of(context).padding.top;
+    Color backgroundColor = Theme.of(context).scaffoldBackgroundColor;
+
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Expenses List"),
-      ),
-      body: StreamBuilder<List<String>>(
-        stream: this.controller.outMonthsWithExpense,
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          } else {
-            return ListView.builder(
-              itemCount: snapshot.data.length,
-              itemBuilder: (context, index) =>
-                  StreamBuilder<List<ExpenseModel>>(
-                stream: this.controller.outExpensesList,
-                builder: (context, snapshot2) {
-                  if (!snapshot2.hasData) {
-                    return Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  } else {
-                    List<ExpenseModel> filteredExpenses = this
-                        .controller
-                        .getFilteredExpenses(
-                            snapshot2.data, snapshot.data[index]);
-                    return ExpansionTile(
-                      title: Text(snapshot.data[index]
-                          .convertToMonthAndYear(Utils.monthsOfTheYear)),
-                      trailing: Text(
-                        this.controller.getTotalAmountFromFilteredExpenses(
-                            filteredExpenses),
-                      ),
-                      children: _buildFilteredExpensesList(filteredExpenses),
-                    );
-                  }
-                },
-              ),
-            );
-          }
-        },
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: EdgeInsets.only(top: statusBarHeight + 20.0, left: 20.0),
+            child: RichText(
+              text: TextSpan(
+                  text: "Hello,\n",
+                  style: TextStyle(color: Colors.black, fontSize: 28),
+                  children: [
+                    TextSpan(
+                      text: "Bruno!",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    )
+                  ]),
+            ),
+          ),
+          Expanded(
+            child: StreamBuilder<List<String>>(
+              stream: this.controller.outMonthsWithExpense,
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
+                } else {
+                  return ListView.builder(
+                    itemCount: snapshot.data.length,
+                    itemBuilder: (context, index) =>
+                        StreamBuilder<List<ExpenseModel>>(
+                      stream: this.controller.outExpensesList,
+                      builder: (context, snapshot2) {
+                        if (!snapshot2.hasData) {
+                          return Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        } else {
+                          List<ExpenseModel> filteredExpenses = this
+                              .controller
+                              .getFilteredExpenses(
+                                  snapshot2.data, snapshot.data[index]);
+                          return ExpansionTile(
+                            title: Text(snapshot.data[index]
+                                .convertToMonthAndYear(Utils.monthsOfTheYear)),
+                            trailing: Text(
+                              this
+                                  .controller
+                                  .getTotalAmountFromFilteredExpenses(
+                                      filteredExpenses),
+                            ),
+                            children:
+                                _buildFilteredExpensesList(filteredExpenses),
+                          );
+                        }
+                      },
+                    ),
+                  );
+                }
+              },
+            ),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: Color(0xFF42224A),
         onPressed: () async {
           await showDialog(
             context: context,
