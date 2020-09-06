@@ -21,20 +21,8 @@ class Utils {
   };
 
   static String getWeekNumberFromDate(DateTime date) {
-    int today = date.weekday;
-    int dayNr = (today + 6) % 7;
-    DateTime thisMonday = date.subtract(Duration(days: (dayNr)));
-    DateTime thisThursday = thisMonday.add(Duration(days: 3));
-    DateTime firstThursday = DateTime(date.year, DateTime.january, 1);
-
-    if (firstThursday.weekday != (DateTime.thursday)) {
-      firstThursday = DateTime(date.year, DateTime.january,
-          1 + ((4 - firstThursday.weekday) + 7) % 7);
-    }
-
-    int x = thisThursday.millisecondsSinceEpoch -
-        firstThursday.millisecondsSinceEpoch;
-    double weekNumber = x.ceil() / 604800000 + 1;
+    int dayOfYear = date.difference(DateTime(date.year, 01, 01)).inDays + 1;
+    int weekNumber = ((dayOfYear - date.weekday + 10) / 7).floor();
     return "W${weekNumber.toStringAsFixed(0)}";
   }
 }
