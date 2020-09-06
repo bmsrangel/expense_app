@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 
 import '../../../../shared/models/expense_model.dart';
-import '../../../../shared/utils/contants.dart';
+import '../../../../shared/utils/utils_class.dart';
 import '../custom_text_field/custom_text_field_widget.dart';
 import 'new_expense_bloc.dart';
 

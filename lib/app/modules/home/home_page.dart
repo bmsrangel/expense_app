@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 
+import '../../shared/extensions/date_extension.dart';
 import '../../shared/models/expense_model.dart';
-import '../../shared/utils/contants.dart';
+import '../../shared/utils/utils_class.dart';
 import 'home_bloc.dart';
 import 'widgets/dismissible_background/dismissible_background_widget.dart';
-import 'widgets/expenses_list/expenses_list_widget.dart';
+import 'widgets/expenses_list/expenses_list_tile_widget.dart';
 import 'widgets/new_expense/new_expense_widget.dart';
-import 'widgets/total_amount/total_amount_widget.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key key}) : super(key: key);
@@ -23,35 +23,43 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              const Text("Expenses List"),
-              StreamBuilder<List<ExpenseModel>>(
-                stream: this.controller.outExpensesList,
-                initialData: <ExpenseModel>[],
-                builder: (context, snapshot) =>
-                    TotalAmountWidget(expensesList: snapshot.data),
-              ),
-            ]),
+        title: const Text("Expenses List"),
       ),
-      body: StreamBuilder<List<ExpenseModel>>(
-        stream: this.controller.outExpensesList,
+      body: StreamBuilder<List<String>>(
+        stream: this.controller.outMonthsWithExpense,
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
             return Center(
-              child: const CircularProgressIndicator(),
-            );
-          } else if (snapshot.data.length == 0) {
-            return Center(
-              child: const Text("No expenses added."),
+              child: CircularProgressIndicator(),
             );
           } else {
-            return ExpensesListWidget(
-              expensesList: snapshot.data,
-              dismissibleBackground: DismissibleBackgroundWidget(),
-              onDismissed: this.controller.onDismissed,
-              serviceProviderImagePaths: Utils.serviceProvidersImagePath,
+            return ListView.builder(
+              itemCount: snapshot.data.length,
+              itemBuilder: (context, index) =>
+                  StreamBuilder<List<ExpenseModel>>(
+                stream: this.controller.outExpensesList,
+                builder: (context, snapshot2) {
+                  if (!snapshot2.hasData) {
+                    return Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  } else {
+                    List<ExpenseModel> filteredExpenses = this
+                        .controller
+                        .getFilteredExpenses(
+                            snapshot2.data, snapshot.data[index]);
+                    return ExpansionTile(
+                      title: Text(snapshot.data[index]
+                          .convertToMonthAndYear(Utils.monthsOfTheYear)),
+                      trailing: Text(
+                        this.controller.getTotalAmountFromFilteredExpenses(
+                            filteredExpenses),
+                      ),
+                      children: _buildFilteredExpensesList(filteredExpenses),
+                    );
+                  }
+                },
+              ),
             );
           }
         },
@@ -68,5 +76,19 @@ class _HomePageState extends State<HomePage> {
         child: const Icon(Icons.add),
       ),
     );
+  }
+
+  List<Widget> _buildFilteredExpensesList(List<ExpenseModel> filteredExpenses) {
+    return filteredExpenses
+        .map<Widget>(
+          (expense) => ExpensesListTileWidget(
+            expenseModel: expense,
+            dismissibleBackground: DismissibleBackgroundWidget(),
+            onDismissed: this.controller.onDismissed,
+            serviceProviderImagePaths: Utils.serviceProvidersImagePath,
+            weekNumberFromDateCalculator: Utils.getWeekNumberFromDate,
+          ),
+        )
+        .toList();
   }
 }
