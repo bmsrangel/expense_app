@@ -30,7 +30,7 @@ class ExpensesListTileWidget extends StatelessWidget {
         title: Text(this.expenseModel.description),
         subtitle: Text(this.weekNumberFromDateCalculator == null
             ? this.expenseModel.date
-            : "${this.expenseModel.date} - ${this.weekNumberFromDateCalculator(DateTime.parse(this.expenseModel.date))}"),
+            : "${this.expenseModel.date} - W${this.weekNumberFromDateCalculator(DateTime.parse(this.expenseModel.date))}"),
         trailing: Text(this.expenseModel.value.toMoney()),
         leading: Image.asset(
           this.serviceProviderImagePaths[this.expenseModel.serviceProvider],

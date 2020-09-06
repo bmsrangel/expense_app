@@ -20,9 +20,12 @@ class Utils {
     12: "December",
   };
 
-  static String getWeekNumberFromDate(DateTime date) {
+  static int getWeekNumberFromDate(DateTime date) {
     int dayOfYear = date.difference(DateTime(date.year, 01, 01)).inDays + 1;
     int weekNumber = ((dayOfYear - date.weekday + 10) / 7).floor();
-    return "W${weekNumber.toStringAsFixed(0)}";
+    if (weekNumber < 1) {
+      weekNumber = getWeekNumberFromDate(DateTime(date.year - 1, 12, 31));
+    }
+    return weekNumber;
   }
 }
